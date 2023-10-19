@@ -13,10 +13,6 @@ solve(data);
 render(data)
 
 
-for(let i=0; i<81; i++) {
-   console.log(Math.floor(i/9) * 9)
-}
-
 // just quickly draw out the board
 function render(d) {
    for(let i=0; i<9; i++) {
@@ -28,20 +24,25 @@ function render(d) {
 
 // solve the board d of a 81 pice sudoku
 function solve(d) {
+   let goBackCounter = 0;
    solveFromIdx(d, 0);
    function solveFromIdx(d, idx) {
-      // skipp filled out ones
-      while(!d[idx]) {
+      // skip prefilled cells
+      while(idx<81 && d[idx] !== 0) {
          idx++;
       }
+      if (idx >= 81) return true;
+
       // see if solution is valid
       let possibles = getValidNrs(d, idx);
       for(nr of possibles) {
          d[idx] = nr;
-         if (solveFromIdx(idx+1)) return true;
+         if (solveFromIdx(d, idx+1)) return true;
       }
       // we must undo move if we recurse back while returning fals upstream
-      d[idx] = 0;
+      d[idx] = 0
+      goBackCounter ++;
+      if ( goBackCounter % 10000 == 0 )(console.log(`had to backup ${goBackCounter} times`));
       return false;
    }
 }
