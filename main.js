@@ -38,8 +38,11 @@ function render(d) {
 
 // solve the board d of a 81 pice sudoku
 function solve(d) {
-   let goBackCounter = 0;
-   console.log("solve finished with: "  +solveFromIdx(d, 0));
+   let backtrackCounter = 0;
+   console.time("solveTime")
+   if (!solveFromIdx(d,0)) throw "found no solution"
+   console.timeEnd("solveTime")
+   console.log(`solve finished while backtracking ${backtrackCounter} times.`);
 
    function solveFromIdx(d, idx) {
       // skip prefilled cells
@@ -56,10 +59,7 @@ function solve(d) {
       }
       // we must undo move if we recurse back while returning fals upstream
       d[idx] = 0
-      goBackCounter ++;
-      if ( goBackCounter % 100000 == 0 ){
-         console.log(`had to backup ${goBackCounter} times`);
-      };
+      backtrackCounter ++;
       return false;
    }
 }
