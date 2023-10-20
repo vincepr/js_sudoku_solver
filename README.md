@@ -1,3 +1,3 @@
-# Brute force Sudoku solver
+# Backtracking/Bruteforce sudoku solver
 
 Work in progress

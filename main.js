@@ -1,17 +1,31 @@
-
-// create our field
-let data = []
-for(let i=0; i<81; i++) {
-   data.push(0); 
+function createNewBoard() {
+   let data = []
+   for(let i=0; i<81; i++) {
+      data.push(0); 
+   }
+   
+   let rngidx = Math.ceil(Math.random()*81)-1;  // 0..80
+   let rngnr = Math.ceil(Math.random()*9);      // 1..9
+   data[rngidx] = rngnr;
+   return data;
 }
 
-let rngidx = Math.ceil(Math.random()*81)-1;  // 0..80
-let rngnr = Math.ceil(Math.random()*9);      // 1..9
-data[rngidx] = rngnr;
+var data = [
+   [0,8,0, 0,9,4, 0,0,0],
+   [0,0,0, 0,0,2, 1,0,3],
+   [2,0,3, 0,0,0, 9,4,0],
+
+   [0,0,8, 0,0,0, 7,9,0],
+   [9,2,0, 0,0,0, 0,5,6],
+   [0,7,6, 0,0,0, 3,0,0],
+
+   [0,0,0, 2,6,0, 0,3,0],
+   [3,0,2, 1,0,0, 0,0,0],
+   [0,5,7, 0,0,0, 2,0,1],
+].flat();
 render(data);
 solve(data);
 render(data)
-
 
 // just quickly draw out the board
 function render(d) {
@@ -25,7 +39,8 @@ function render(d) {
 // solve the board d of a 81 pice sudoku
 function solve(d) {
    let goBackCounter = 0;
-   solveFromIdx(d, 0);
+   console.log("solve finished with: "  +solveFromIdx(d, 0));
+
    function solveFromIdx(d, idx) {
       // skip prefilled cells
       while(idx<81 && d[idx] !== 0) {
@@ -42,7 +57,9 @@ function solve(d) {
       // we must undo move if we recurse back while returning fals upstream
       d[idx] = 0
       goBackCounter ++;
-      if ( goBackCounter % 10000 == 0 )(console.log(`had to backup ${goBackCounter} times`));
+      if ( goBackCounter % 100000 == 0 ){
+         console.log(`had to backup ${goBackCounter} times`);
+      };
       return false;
    }
 }
@@ -50,7 +67,7 @@ function solve(d) {
 function getValidNrs(d, idx) {
    const nrs =[1,2,3 ,4,5,6, 7,8,9]; 
    let valids = [];
-   for(nr in nrs) {
+   for(nr of nrs) {
       if (isValidNr(d, idx, nr)) valids.push(nr);
    }
    return valids;
@@ -72,8 +89,8 @@ function isValidNr(d, idx, val) {
    
    // check if 3x3 Box is ok
    let xBox;
-   if (yStart > 5) xBox = [6,7,8]
-   else if (yStart > 3) xBox = [3,4,5];
+   if (yStart >= 6) xBox = [6,7,8]
+   else if (yStart >= 3) xBox = [3,4,5];
    else xBox = [0,1,2];
 
    let yBox;
@@ -81,8 +98,8 @@ function isValidNr(d, idx, val) {
    else if(xStart >= 27) yBox = [27,36,45]
    else yBox = [0,9,18];
 
-   for (let i in xBox) {
-      for (let ii in yBox) {
+   for (let i of xBox) {
+      for (let ii of yBox) {
          if (d[i+ii] === val) return false;
       }
    }
