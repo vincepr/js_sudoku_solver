@@ -1,31 +1,32 @@
-function createNewBoard() {
+// generates a peseudo-random board by randomly solving an empty board
+function generateRandomBoard() {
    let data = []
    for(let i=0; i<81; i++) {
       data.push(0); 
    }
-   
-   let rngidx = Math.ceil(Math.random()*81)-1;  // 0..80
-   let rngnr = Math.ceil(Math.random()*9);      // 1..9
-   data[rngidx] = rngnr;
+   solve(data, true);
+   render(data);
    return data;
 }
 
-var data = [
-   [0,8,0, 0,9,4, 0,0,0],
-   [0,0,0, 0,0,2, 1,0,3],
-   [2,0,3, 0,0,0, 9,4,0],
+// var data = [
+//    [0,8,0, 0,9,4, 0,0,0],
+//    [0,0,0, 0,0,2, 1,0,3],
+//    [2,0,3, 0,0,0, 9,4,0],
 
-   [0,0,8, 0,0,0, 7,9,0],
-   [9,2,0, 0,0,0, 0,5,6],
-   [0,7,6, 0,0,0, 3,0,0],
+//    [0,0,8, 0,0,0, 7,9,0],
+//    [9,2,0, 0,0,0, 0,5,6],
+//    [0,7,6, 0,0,0, 3,0,0],
 
-   [0,0,0, 2,6,0, 0,3,0],
-   [3,0,2, 1,0,0, 0,0,0],
-   [0,5,7, 0,0,0, 2,0,1],
-].flat();
-render(data);
-solve(data);
-render(data)
+//    [0,0,0, 2,6,0, 0,3,0],
+//    [3,0,2, 1,0,0, 0,0,0],
+//    [0,5,7, 0,0,0, 2,0,1],
+// ].flat();
+// render(data);
+// solve(data);
+// render(data);
+
+generateRandomBoard();
 
 // just quickly draw out the board
 function render(d) {
@@ -37,14 +38,14 @@ function render(d) {
 }
 
 // solve the board d of a 81 pice sudoku
-function solve(d) {
+function solve(d, randomize = false) {
    let backtrackCounter = 0;
    console.time("solveTime")
-   if (!solveFromIdx(d,0)) throw "found no solution"
+   if (!solveFromIdx(d,0, randomize)) throw "found no solution"
    console.timeEnd("solveTime")
    console.log(`solve finished while backtracking ${backtrackCounter} times.`);
 
-   function solveFromIdx(d, idx) {
+   function solveFromIdx(d, idx, randomize = false) {
       // skip prefilled cells
       while(idx<81 && d[idx] !== 0) {
          idx++;
@@ -52,10 +53,10 @@ function solve(d) {
       if (idx >= 81) return true;
 
       // see if solution is valid
-      let possibles = getValidNrs(d, idx);
+      let possibles = getValidNrs(d, idx, randomize);
       for(nr of possibles) {
          d[idx] = nr;
-         if (solveFromIdx(d, idx+1)) return true;
+         if (solveFromIdx(d, idx+1, randomize)) return true;
       }
       // we must undo move if we recurse back while returning fals upstream
       d[idx] = 0
@@ -64,8 +65,9 @@ function solve(d) {
    }
 }
 
-function getValidNrs(d, idx) {
-   const nrs =[1,2,3 ,4,5,6, 7,8,9]; 
+function getValidNrs(d, idx, randomize = false) {
+   let nrs =[1,2,3 ,4,5,6, 7,8,9]; 
+   if (randomize) nrs = nrs.sort(el => Math.random() -0.5); // with this we can generate sudo-random boards by just solving empty boards
    let valids = [];
    for(nr of nrs) {
       if (isValidNr(d, idx, nr)) valids.push(nr);
